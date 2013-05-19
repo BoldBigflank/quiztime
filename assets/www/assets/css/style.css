@@ -10,6 +10,9 @@ body{
 		margin-left: 24px;
 		width: 900px;
 	}
+	.tiles .tile{
+		box-shadow: none !important;
+	}
 	#leaderboard_container, #user_container{
 		width: 440px;
 		margin: 0;
