@@ -52,26 +52,29 @@ var socket = io.connect('http://qtserver.herokuapp.com');
       }
 
       if(typeof data.state !== 'undefined'){
+
         switch(data.state){
           case 'prep':
             if(typeof data.now !== 'undefined' && typeof data.begin !== 'undefined'){
               countdown.start( Math.ceil((data.begin - data.now) /1000));
             }
             enable_fields(false);
+            if(typeof data.count !== 'undefined'){
+              answers.generate(data.count);
+            }
             break;
           case 'ended':
             countdown.game_button();
             enable_fields(false);
             break;
           case 'active':
-            if(typeof data.count !== 'undefined'){
-              answers.generate(data.count);
-            }
             if(typeof data.now !== 'undefined' && typeof data.end !== 'undefined'){
               countdown.start( Math.ceil((data.end - data.now) /1000));
             }
             enable_fields(true);
-
+            if(typeof data.count !== 'undefined'){
+              answers.generate(data.count);
+            }
             break;
         }
       }

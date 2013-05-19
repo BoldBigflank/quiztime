@@ -61,6 +61,9 @@ body{
 #notify{
 	display: none;
 }
+#answer-input{
+	width: 425px;
+}
 #answer_container .countdown{
 	float: left;
 	width: 110px;
