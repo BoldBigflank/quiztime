@@ -10,9 +10,22 @@ var socket = io.connect('http://qtserver.herokuapp.com');
     var countdown = new Countdown();
     var notify = new Notify();
 
+    socket.on('answers', function (data) {
+      //console.log('answers array', data);
+      var tiles = $('.tiles .tile');
+      for(var i = 0; i < data.length; i++){
+        if(typeof tiles.eq(i).data('flipped') == 'undefined'){
+          tiles.eq(i).html('<span class="answer_grey">' + data[i] + '</span>');
+        }
+      }
+    });
+
     socket.on('game', function (data) {
-      console.log('game', data);
+      // console.log('game', data);
       if(typeof data.title !== 'undefined'){
+        if(typeof data.title === null){
+          data.title = 'Loading..';
+        }
         $('#question').html(data.title);
       }
 
@@ -65,8 +78,8 @@ var socket = io.connect('http://qtserver.herokuapp.com');
 
       if(typeof data.answers !== 'undefined'){
         for(var i = 0; i < data.answers.length; i++){
-          console.log('loop');
-          answers.update_tile(data.answers[i].index, data.answers[i].text);
+          // console.log('loop');
+          answers.update_tile(data.answers[i].index, data.answers[i].text, user_info);
         }
       }
     });
@@ -74,7 +87,7 @@ var socket = io.connect('http://qtserver.herokuapp.com');
     socket.emit('join', function(playerObj){
       user_info.id = playerObj.id;
       user_info.update(playerObj.name, playerObj.score, users);
-      console.log(user_info);
+      // console.log(user_info);
     });
 
     socket.on('alert', function (data) {
@@ -84,9 +97,9 @@ var socket = io.connect('http://qtserver.herokuapp.com');
     //Begin game
     $(document).on('click', '#begin-btn', function(){
       socket.emit('state', 'prep', function(err, res){
-        console.log('sent answer');
-        console.log(res);
-        console.log(err);
+        // console.log('sent answer');
+        // console.log(res);
+        // console.log(err);
       });
     });
 
@@ -101,15 +114,12 @@ var socket = io.connect('http://qtserver.herokuapp.com');
     // });
     $('#answer-btn').click(function(){
       var val = $('#answer-input').val();
-      console.log(val);
+      // console.log(val);
       if(val !== ''){
-        console.log('test');
+        // console.log('test');
         socket.emit('answer', val);
         $("#answer-input").val('').focus()
 
-      }else{
-        console.log('no');
-        console.log(val);
       }
     });
 
@@ -118,7 +128,7 @@ var socket = io.connect('http://qtserver.herokuapp.com');
       var val = $('#username-input').val();
       if(val !== ''){
         socket.emit('name', val, function(err, res){
-          console.log(res);
+          // console.log(res);
         });
       }
     });
@@ -145,6 +155,7 @@ var UserInfo = function(){
   this.score = null;
   this.position = null;
   this.round_score = null;
+  this.answers = null
 
   this.update = function(name, score, position, round_score, users){
     this.name = name;
@@ -152,6 +163,11 @@ var UserInfo = function(){
     this.position = position;
     this.round_score = round_score;
 
+    if(typeof users != "undefined"){
+      this.answers = users.user_array[this.position -1].answers;
+    }
+
+    // console.log('users', users);
     this.update_page();
   };
 
@@ -172,7 +188,7 @@ var Notify = function(){
     this.element.html(text);
     this.element.fadeIn();
     setTimeout(function(){
-      console.log('hide');
+      // console.log('hide');
       self.element.fadeOut();
     }, 3000)
   };
@@ -181,7 +197,7 @@ var Countdown = function(){
   this.element = $('#answer_container .countdown');
 
   this.start = function(seconds){
-    console.log('seconds', seconds);
+    // console.log('seconds', seconds);
     //console.log(Math.floor(seconds));
     this.element.html('');
     this.element.countdown({
@@ -194,7 +210,7 @@ var Countdown = function(){
   };
 
   this.game_button = function(){
-    console.log('game button');
+    // console.log('game button');
     this.element.html(
       $('<button>', {'id': 'begin-btn', 'class': 'btn btn-large btn-primary'}).html('Next')
     );
@@ -207,25 +223,35 @@ var Answers = function(){
     
     this.element.html('');
 
-    console.log('generate');
+    // console.log('generate');
 
     for(var i = 0; i < count; i++){
       this.element.append($('<li>', {'class': 'tile'}));
     }
   };
 
-  this.update_tile = function(i, text){
-    console.log('updating!');
-    console.log(i, text);
-    console.log(this.element.find('.tile').eq(i).html('test'));
+  this.update_tile = function(i, text, user_info){
+    // console.log('updating!');
+    // console.log(i, text);
+    // console.log(this.element.find('.tile').eq(i).html('test'));
     
     this.element.find('.tile').eq(i).html(text);
+
+    // console.log('answers', user_info.answers);
+
+    var color = '#242E39';
+    if(typeof user_info != 'undefined'){
+      // console.log('test', i, user_info.answers);
+      if( $.inArray(i, user_info.answers) !== -1){
+        color = '#0044cc';
+      }
+    }
 
     if(typeof this.element.find('.tile').eq(i).data('flipped') == 'undefined'){
       this.element.find('.tile').eq(i).flip({
          direction: 'bt',
          content: text,
-         color: '#242E39',
+         color: color,
          speed: 200
        });
       this.element.find('.tile').eq(i).data('flipped', true);

@@ -77,6 +77,10 @@ body{
 	max-height: 480px;
 	overflow: hidden;
 }
+table.leaders tbody tr td{
+	max-width: 240px;
+	overflow: hidden;
+}
 .container{
 	background: #FFF;
 	border-radius: 4px;
@@ -94,6 +98,9 @@ body{
 	width:100%;
 	opacity: .9;
 	background:#333;
+}
+#username-input{
+	width: 515px;
 }
 #info_bar h3{
 	line-height: 8px;
@@ -144,4 +151,7 @@ body{
 	min-width: 25px;
 	border: 1px solid #CCC;
 	box-shadow: #eee 2px 4px 2px 1px;
+}
+.tiles .tile .answer_grey{
+	color: #CCC;
 }
