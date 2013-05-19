@@ -8,6 +8,7 @@ var socket = io.connect('http://qtserver.herokuapp.com');
     var answers = new Answers();
     var user_info = new UserInfo();
     var countdown = new Countdown();
+    var notify = new Notify();
 
     socket.on('game', function (data) {
       console.log('game', data);
@@ -25,6 +26,7 @@ var socket = io.connect('http://qtserver.herokuapp.com');
                 data.players[i].name,
                 data.players[i].score,
                 i + 1,
+                data.players[i].answers.length,
                 users
               );
               break;
@@ -76,7 +78,7 @@ var socket = io.connect('http://qtserver.herokuapp.com');
     });
 
     socket.on('alert', function (data) {
-      console.log('error', data);
+      notify.alert(data);
     });
 
     //Begin game
@@ -88,7 +90,15 @@ var socket = io.connect('http://qtserver.herokuapp.com');
       });
     });
 
+    $('#info_bar .username').click(function(){
+      $('#username_modal').modal();
+    });
     //Answer submit
+    // $('#answer-input').keypress(function(e){
+    //   if(e.which === 13){
+    //     console.log('return');
+    //   }
+    // });
     $('#answer-btn').click(function(){
       var val = $('#answer-input').val();
       console.log(val);
@@ -134,22 +144,39 @@ var UserInfo = function(){
   this.name = null;
   this.score = null;
   this.position = null;
+  this.round_score = null;
 
-  this.update = function(name, score, position, users){
+  this.update = function(name, score, position, round_score, users){
     this.name = name;
     this.score = score;
     this.position = position;
+    this.round_score = round_score;
 
     this.update_page();
   };
 
   this.update_page = function(){
-    $('#user_container .username_value').html(this.name);
-    $('#user_container .rank_value').html(this.position);
+    $('#info_bar .username .username_val').html(this.name);
+    $('#info_bar .score .score_val').html(this.round_score);
+    $('#info_bar .rank .rank_val').html(this.position);
     $('#username-input').attr('placeholder', this.name);
   }
 
 };
+var Notify = function(){
+
+  var self = this;
+  this.element = $('#notify');
+
+  this.alert = function(text){
+    this.element.html(text);
+    this.element.fadeIn();
+    setTimeout(function(){
+      console.log('hide');
+      self.element.fadeOut();
+    }, 3000)
+  };
+}
 var Countdown = function(){
   this.element = $('#answer_container .countdown');
 

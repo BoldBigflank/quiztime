@@ -65,13 +65,27 @@
 				</tbody>
 			</table>
 		</div>
-		<div id="user_container" class="container span3">
-			<div class="page-header"><h4><span class="username_value">Username</span></h4><small>Rank <span class="rank_value"></span></small></div>
-			<div class="username">
-				<input type="text" id="username-input">
-				<button id="update-btn" class="btn btn-primary">Update Name</button>
+		<div id="username_modal" class="modal hide fade">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		    <h3>Change name</h3>
+		  </div>
+		  <div class="modal-body">
+		    <div class="username">
+				<input type="text" class="input-xlarge" id="username-input">
 			</div>
+		  </div>
+		  <div class="modal-footer">
+		    <a href="#" data-toggle="modal" data-target="#username_modal" class="btn">Close</a>
+		    <a href="#" id="update-btn" data-toggle="modal" data-target="#username_modal" class="btn btn-primary">Save changes</a>
+		  </div>
 		</div>
+	</div>
+	<div id="info_bar">
+		<span class="username"><h3 class="username_val"></h3></span>
+		<span class="score"><h4>Score: <span class="score_val">0</span></h4></span>
+		<span class="rank"><h4>Rank: #<span class="rank_val">?</span></h4></span>
+		<div id="notify"></div>
 	</div>
 	<script type="text/javascript" src="cordova-2.4.0.js"></script>
 	<script type="text/javascript" src="js/index.js"></script>

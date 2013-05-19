@@ -13,8 +13,8 @@ body{
 	.tiles .tile{
 		box-shadow: none !important;
 	}
-	#leaderboard_container, #user_container{
-		width: 440px;
+	#leaderboard_container{
+		width: 900px;
 		margin: 0;
 		margin-top: 24px;
 	}
@@ -58,6 +58,9 @@ body{
 	line-height: 52px;
 	font-weight: bold;
 }
+#notify{
+	display: none;
+}
 #answer_container .countdown{
 	float: left;
 	width: 110px;
@@ -81,6 +84,40 @@ body{
 	margin-top: 1em;
 	box-shadow: 4px 4px 12px;
 
+}
+#info_bar{
+	color: #fff;
+	position:fixed;
+	left:0px;
+	bottom:0px;
+	height:30px;
+	width:100%;
+	opacity: .9;
+	background:#333;
+}
+#info_bar h3{
+	line-height: 8px;
+}
+#info_bar h4{
+	line-height: 12px;
+}
+#info_bar .username{
+	float: left;
+	margin-left: 12px;
+}
+#info_bar .score{
+	float: left;
+	margin-left: 12px;
+}
+#info_bar .rank{
+	float: left;
+	margin-left: 12px;
+}
+#info_bar #notify{
+	margin-left: 24px;
+	float: left;
+	line-height: 28px;
+	max-width: 400px;
 }
 #answer-btn{
 	margin-left: 12px;
