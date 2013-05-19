@@ -10,6 +10,10 @@ var socket = io.connect('http://qtserver.herokuapp.com');
     var countdown = new Countdown();
 
     socket.on('game', function (data) {
+      console.log('game', data);
+      if(typeof data.title !== 'undefined'){
+        $('#question').html(data.title);
+      }
 
       if(typeof data.players !== 'undefined'){
         users.createUsers(data.players);
@@ -35,7 +39,9 @@ var socket = io.connect('http://qtserver.herokuapp.com');
       if(typeof data.state !== 'undefined'){
         switch(data.state){
           case 'prep':
-            countdown.start(5);
+            if(typeof data.now !== 'undefined' && typeof data.begin !== 'undefined'){
+              countdown.start( Math.ceil((data.begin - data.now) /1000));
+            }
             enable_fields(false);
             break;
           case 'ended':
@@ -46,8 +52,9 @@ var socket = io.connect('http://qtserver.herokuapp.com');
             if(typeof data.count !== 'undefined'){
               answers.generate(data.count);
             }
-            
-            countdown.start( (data.end - data.begin) /1000);
+            if(typeof data.now !== 'undefined' && typeof data.end !== 'undefined'){
+              countdown.start( Math.ceil((data.end - data.now) /1000));
+            }
             enable_fields(true);
 
             break;
@@ -87,11 +94,9 @@ var socket = io.connect('http://qtserver.herokuapp.com');
       console.log(val);
       if(val !== ''){
         console.log('test');
-        socket.emit('answer', val, function(err, res){
-          console.log('sent answer');
-          console.log(res);
-          console.log(err);
-        });
+        socket.emit('answer', val);
+        $("#answer-input").val('').focus()
+
       }else{
         console.log('no');
         console.log(val);
@@ -164,7 +169,7 @@ var Countdown = function(){
   this.game_button = function(){
     console.log('game button');
     this.element.html(
-      $('<button>', {'id': 'begin-btn', 'class': 'btn btn-large btn-primary'}).html('Begin')
+      $('<button>', {'id': 'begin-btn', 'class': 'btn btn-large btn-primary'}).html('Next')
     );
   };
 }
@@ -186,8 +191,18 @@ var Answers = function(){
     console.log('updating!');
     console.log(i, text);
     console.log(this.element.find('.tile').eq(i).html('test'));
+    
     this.element.find('.tile').eq(i).html(text);
-    this.element.find('.tile').eq(i).css('background-color', '#333');
+
+    if(typeof this.element.find('.tile').eq(i).data('flipped') == 'undefined'){
+      this.element.find('.tile').eq(i).flip({
+         direction: 'bt',
+         content: text,
+         color: '#242E39',
+         speed: 200
+       });
+      this.element.find('.tile').eq(i).data('flipped', true);
+    }
   }
 };
 var Leaderboard = function(){
@@ -209,7 +224,7 @@ var Leaderboard = function(){
         $('<tr>').append(
           $('<td>').html(i + 1),
           $('<td>').html(name),
-          $('<td>').append( $('<span>', {'class': 'badge ' + this.get_badge_class(i)}).append(users.user_array[i].score) )
+          $('<td>').append( $('<span>', {'class': 'badge ' + this.get_badge_class(i)}).append(users.user_array[i].answers.length) )
         )
       );
     }

@@ -90,15 +90,18 @@ body{
 	list-style: none;
 }
 .tiles .tile{
+	text-align: center;
+	line-height: 11px;
 	float: left;
-	height: 20px;
+	height: 12px;
 	margin: 4px;
 	background-color: #F3f3f3;
 	padding: 4px;
 	color: #fff;
+	font-size: 11px;
 	font-weight: bold;
 	border-radius: 4px;
-	min-width: 200px;
+	min-width: 25px;
 	border: 1px solid #CCC;
 	box-shadow: #eee 2px 4px 2px 1px;
 }
