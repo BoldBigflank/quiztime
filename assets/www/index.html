@@ -46,7 +46,7 @@
 			<div id="answer_container" class="offset">
 				<div class="countdown"></div>
 				<div id="answer">
-					<input id="answer-input" class="input-xxlarge" type="text" placeholder="Your answer">
+					<input id="answer-input" class="input-xxlarge" type="text" placeholder="Your answer" onkeydown="if (event.keyCode == 13) document.getElementById('answer-btn').click()">
 					<button id="answer-btn" class="btn btn-primary">Answer</button>
 				</div>
 			</div>

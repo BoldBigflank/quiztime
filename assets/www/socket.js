@@ -15,7 +15,10 @@ var socket = io.connect('http://qtserver.herokuapp.com');
       if(typeof data.state !== 'undefined'){
         switch(data.state){
           case 'prep':
-            countdown.start(5);
+            if(typeof data.begin !== 'undefined' && typeof data.end !== 'undefined'){
+              var now = new Date().getTime()
+              countdown.start( Math.ceil((data.begin - now) /1000));
+            }
             enable_fields(false);
             break;
           case 'ended':
@@ -23,7 +26,10 @@ var socket = io.connect('http://qtserver.herokuapp.com');
             enable_fields(false);
             break;
           case 'active':
-            countdown.start( (data.end - data.begin) /1000);
+            if(typeof data.begin !== 'undefined' && typeof data.end !== 'undefined'){
+              var now = new Date().getTime()
+              countdown.start( Math.ceil((data.end - now) /1000));
+            }
             enable_fields(true);
             break;
         }
@@ -64,11 +70,9 @@ var socket = io.connect('http://qtserver.herokuapp.com');
       console.log(val);
       if(val !== ''){
         console.log('test');
-        socket.emit('answer', val, function(err, res){
-          console.log('sent answer');
-          console.log(res);
-          console.log(err);
-        });
+        socket.emit('answer', val);
+        $("#answer-input").val('').focus()
+
       }else{
         console.log('no');
         console.log(val);
@@ -167,7 +171,7 @@ var Countdown = function(){
   this.game_button = function(){
     console.log('game button');
     this.element.html(
-      $('<button>', {'id': 'begin-btn', 'class': 'btn btn-large btn-primary'}).html('Begin')
+      $('<button>', {'id': 'begin-btn', 'class': 'btn btn-large btn-primary'}).html('Next')
     );
   };
 }
