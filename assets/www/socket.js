@@ -7,9 +7,28 @@ var socket = io.connect('http://qtserver.herokuapp.com');
     var leaderboard = new Leaderboard();
     var answers = new Answers();
     var user_info = new UserInfo();
+    var countdown = new Countdown();
 
     socket.on('game', function (data) {
       console.log('game', data);
+
+      if(typeof data.state !== 'undefined'){
+        switch(data.state){
+          case 'prep':
+            countdown.start(5);
+            enable_fields(false);
+            break;
+          case 'ended':
+            countdown.game_button();
+            enable_fields(false);
+            break;
+          case 'active':
+            countdown.start( (data.end - data.begin) /1000);
+            enable_fields(true);
+            break;
+        }
+      }
+
       if(typeof data.count !== 'undefined'){
         answers.generate(data.count);
       }
@@ -26,17 +45,33 @@ var socket = io.connect('http://qtserver.herokuapp.com');
       console.log(user_info);
     });
 
-    socket.on('error', function (data) {
+    socket.on('alert', function (data) {
       console.log('error', data);
+    });
+
+    //Begin game
+    $(document).on('click', '#begin-btn', function(){
+      socket.emit('state', 'prep', function(err, res){
+        console.log('sent answer');
+        console.log(res);
+        console.log(err);
+      });
     });
 
     //Answer submit
     $('#answer-btn').click(function(){
       var val = $('#answer-input').val();
+      console.log(val);
       if(val !== ''){
+        console.log('test');
         socket.emit('answer', val, function(err, res){
+          console.log('sent answer');
           console.log(res);
+          console.log(err);
         });
+      }else{
+        console.log('no');
+        console.log(val);
       }
     });
 
@@ -45,43 +80,63 @@ var socket = io.connect('http://qtserver.herokuapp.com');
       var val = $('#username-input').val();
       if(val !== ''){
         socket.emit('name', val, function(err, res){
-          //console.log(res);
+          console.log(res);
         });
       }
     });
 
     socket.on('game', function (data) {
-      console.log('game', data);
       if(typeof data.count !== 'undefined'){
         answers.generate(data.count);
       }
       if(typeof data.players !== 'undefined'){
         users.createUsers(data.players);
-        leaderboard.generate(users);
-
+        
         if(user_info.id !== null){
-          user_info.update(
-            data.players[user_info.id - 1].name,
-            data.players[user_info.id - 1].score,
-            users
-          );
+          for(var i = 0; i < data.players.length; i++){
+            if(data.players[i].id == user_info.id){
+              user_info.update(
+                data.players[i].name,
+                data.players[i].score,
+                i + 1,
+                users
+              );
+              break;
+            }
+          }
+          
         }
 
+        leaderboard.generate(users, user_info.id);
       }
     });
 
   });
 
+function enable_fields(bool){
+  var fields = [$('#answer-input'), $('#answer-btn')];
+  
+  for(var i = 0; i < fields.length; i++){
+    var field = fields[i];
+
+    if(bool){
+      field.removeAttr('disabled');
+    }else{
+      field.attr('disabled', 'disabled');
+    }
+  }
+
+}
 var UserInfo = function(){
   this.id = null;
   this.name = null;
   this.score = null;
   this.position = null;
 
-  this.update = function(name, score, users){
+  this.update = function(name, score, position, users){
     this.name = name;
     this.score = score;
-    this.position = users.user_array[this.id-1].answers.length;
+    this.position = position;
 
     this.update_page();
   };
@@ -93,6 +148,29 @@ var UserInfo = function(){
   }
 
 };
+var Countdown = function(){
+  this.element = $('#answer_container .countdown');
+
+  this.start = function(seconds){
+    console.log('seconds', seconds);
+    //console.log(Math.floor(seconds));
+    this.element.html('');
+    this.element.countdown({
+        startTime: Math.floor(seconds).toString(),
+        stepTime: 1,
+        digitWidth: 53,
+        digitHeight: 77,
+        image: "assets/img/digits.png"
+    });
+  };
+
+  this.game_button = function(){
+    console.log('game button');
+    this.element.html(
+      $('<button>', {'id': 'begin-btn', 'class': 'btn btn-large btn-primary'}).html('Begin')
+    );
+  };
+}
 var Answers = function(){
   this.element = $('ul.tiles');
 
@@ -113,17 +191,21 @@ var Leaderboard = function(){
 
   this.element = $('table.leaders tbody');
 
-  this.generate = function(users){
+  this.generate = function(users, id){
     this.element.html('');
     //var changed_elements = [];
     //users.user_array = users.user_array.sort(function(a,b){return b.score - a.score});
     //console.log(users.user_array.sort());
     var max = users.user_array.length < 10 ? users.user_array.length : 10;
     for(var i = 0; i < max; i++){
+      var name = users.user_array[i].name;
+      if(users.user_array[i].id === id){
+        name = '<strong>' + name + '</strong>';
+      }
       this.element.append(
         $('<tr>').append(
           $('<td>').html(i + 1),
-          $('<td>').html(users.user_array[i].name),
+          $('<td>').html(name),
           $('<td>').append( $('<span>', {'class': 'badge ' + this.get_badge_class(i)}).append(users.user_array[i].score) )
         )
       );

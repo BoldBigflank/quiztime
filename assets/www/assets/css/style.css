@@ -3,6 +3,9 @@ body{
 	color: #282828;
 }
 @media (max-width:1024px){
+	#content{
+		min-width: 960px !important;
+	}
 	#tile_container{
 		margin-left: 24px;
 		width: 900px;
@@ -24,10 +27,28 @@ body{
 		margin-right: 48px;
 	}
 }
-#content{
-	min-width: 1160px;
+@media (max-width: 800px){
+	#content{
+		min-width: 640px !important;
+	}
+	#tile_container{
+		min-width: 0 !important;
+		width: 640px;
+	}
+	#leaderboard_container, #user_container{
+		width: 640px;
+		margin-left: 24px;
+	}
+	#answer-input{
+		width: 220px;
+	}
 }
-
+#content{
+	min-width: 1240px;
+}
+#leaderboard_container, #user_container{
+	min-width: 380px;
+}
 #question{
 	color: #282828;
 	font-size: 58px;
