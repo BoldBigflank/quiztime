@@ -32,16 +32,22 @@ var socket = io.connect('http://qtserver.herokuapp.com');
 
     //Answer submit
     $('#answer-btn').click(function(){
-      socket.emit('answer', $('#answer-input').val(), function(err, res){
-        console.log(res);
-      });
+      var val = $('#answer-input').val();
+      if(val !== ''){
+        socket.emit('answer', val, function(err, res){
+          console.log(res);
+        });
+      }
     });
 
     //Username update
     $('#update-btn').click(function(){
-      socket.emit('name', $('#username-input').val(), function(err, res){
-        //console.log(res);
-      });
+      var val = $('#username-input').val();
+      if(val !== ''){
+        socket.emit('name', val, function(err, res){
+          //console.log(res);
+        });
+      }
     });
 
     socket.on('game', function (data) {

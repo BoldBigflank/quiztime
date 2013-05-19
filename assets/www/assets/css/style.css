@@ -2,6 +2,31 @@ body{
 	background-image: url('images/mochaGrunge.png');
 	color: #282828;
 }
+@media (max-width:1024px){
+	#tile_container{
+		margin-left: 24px;
+		width: 900px;
+	}
+	#leaderboard_container, #user_container{
+		width: 440px;
+		margin: 0;
+		margin-top: 24px;
+	}
+	#leaderboard_container{
+		float: left;
+		margin-left: 24px;
+		margin-right: 20px;
+	}
+	#user_container{
+		float: left;
+	}
+	#answer{
+		margin-right: 48px;
+	}
+}
+#content{
+	min-width: 1160px;
+}
 
 #question{
 	color: #282828;
@@ -12,11 +37,14 @@ body{
 #answer_container .countdown{
 	float: left;
 	width: 110px;
+	margin: 12px;
 }
+#tile_container{
+	min-width: 640px;
+}
+
 #answer{
 	float: right;
-	margin-top: 46px;
-	margin-right: 68px;
 }
 #leaderboard_container{
 	max-height: 480px;
