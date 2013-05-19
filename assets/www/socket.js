@@ -10,7 +10,27 @@ var socket = io.connect('http://qtserver.herokuapp.com');
     var countdown = new Countdown();
 
     socket.on('game', function (data) {
-      console.log('game', data);
+
+      if(typeof data.players !== 'undefined'){
+        users.createUsers(data.players);
+        
+        if(user_info.id !== null){
+          for(var i = 0; i < data.players.length; i++){
+            if(data.players[i].id == user_info.id){
+              user_info.update(
+                data.players[i].name,
+                data.players[i].score,
+                i + 1,
+                users
+              );
+              break;
+            }
+          }
+          
+        }
+
+        leaderboard.generate(users, user_info.id);
+      }
 
       if(typeof data.state !== 'undefined'){
         switch(data.state){
@@ -23,19 +43,22 @@ var socket = io.connect('http://qtserver.herokuapp.com');
             enable_fields(false);
             break;
           case 'active':
+            if(typeof data.count !== 'undefined'){
+              answers.generate(data.count);
+            }
+            
             countdown.start( (data.end - data.begin) /1000);
             enable_fields(true);
+
             break;
         }
       }
 
-      if(typeof data.count !== 'undefined'){
-        answers.generate(data.count);
-      }
-      if(typeof data.players !== 'undefined'){
-        //username = data.players[uuid].name;
-        users.createUsers(data.players);
-        leaderboard.generate(users);
+      if(typeof data.answers !== 'undefined'){
+        for(var i = 0; i < data.answers.length; i++){
+          console.log('loop');
+          answers.update_tile(data.answers[i].index, data.answers[i].text);
+        }
       }
     });
 
@@ -82,32 +105,6 @@ var socket = io.connect('http://qtserver.herokuapp.com');
         socket.emit('name', val, function(err, res){
           console.log(res);
         });
-      }
-    });
-
-    socket.on('game', function (data) {
-      if(typeof data.count !== 'undefined'){
-        answers.generate(data.count);
-      }
-      if(typeof data.players !== 'undefined'){
-        users.createUsers(data.players);
-        
-        if(user_info.id !== null){
-          for(var i = 0; i < data.players.length; i++){
-            if(data.players[i].id == user_info.id){
-              user_info.update(
-                data.players[i].name,
-                data.players[i].score,
-                i + 1,
-                users
-              );
-              break;
-            }
-          }
-          
-        }
-
-        leaderboard.generate(users, user_info.id);
       }
     });
 
@@ -178,13 +175,19 @@ var Answers = function(){
     
     this.element.html('');
 
+    console.log('generate');
+
     for(var i = 0; i < count; i++){
       this.element.append($('<li>', {'class': 'tile'}));
     }
   };
 
   this.update_tile = function(i, text){
-    this.element.eq(i).html(text);
+    console.log('updating!');
+    console.log(i, text);
+    console.log(this.element.find('.tile').eq(i).html('test'));
+    this.element.find('.tile').eq(i).html(text);
+    this.element.find('.tile').eq(i).css('background-color', '#333');
   }
 };
 var Leaderboard = function(){
